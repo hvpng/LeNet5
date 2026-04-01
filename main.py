@@ -34,7 +34,6 @@ def run(config, version="v1"):
     model = LeNet5(     
         num_classes    = config["num_classes"],
         input_channels = config["input_channels"],
-        activation     = config.get("activation", "tanh"),
         batchnorm      = config.get("batchnorm", False),
         dropout        = config.get("dropout", 0.0),
     ).to(device)
@@ -49,14 +48,14 @@ def run(config, version="v1"):
     history   = train(model, train_loader, config, device, save_path)
 
     model.load_state_dict(torch.load(save_path, map_location=device))
-    evaluate(model, test_loader, device, class_names, f"{dataset}_{version}")
-    plot_history(history, f"{dataset}_{version}")
+    evaluate(model, test_loader, device, class_names, f"{dataset}_{version}", save_dir=ckpt_dir)
+    plot_history(history, f"{dataset}_{version}", save_dir=ckpt_dir)
 
 if __name__ == "__main__":
     # ── Baseline ──────────────────────────
-    run(CONFIG_MNIST,   "v1")
-    # run(CONFIG_FASHION, "v1")
-    # run(CONFIG_MEDICAL, "v1")
+    # run(CONFIG_MNIST,   "v1")
+    run(CONFIG_FASHION, "v1")
+    run(CONFIG_MEDICAL, "v1")
 
     # ── Cải tiến ──────────────────────────
     # run(CONFIG_MNIST_V2,   "v2")

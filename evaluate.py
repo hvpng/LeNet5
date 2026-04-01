@@ -1,10 +1,11 @@
 import torch
 import numpy as np
+import os
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.metrics import classification_report, confusion_matrix
 
-def evaluate(model, test_loader, device, class_names, dataset_name):
+def evaluate(model, test_loader, device, class_names, dataset_name, save_dir="."):
     """
     RBF output: argmin (distance nhỏ nhất = closest class).
     Khác với softmax (argmax).
@@ -29,6 +30,7 @@ def evaluate(model, test_loader, device, class_names, dataset_name):
                                 target_names=class_names, digits=4))
 
     cm = confusion_matrix(all_labels, all_preds)
+    os.makedirs(save_dir, exist_ok=True)
     plt.figure(figsize=(10, 8))
     sns.heatmap(cm, annot=True, fmt="d", cmap="Blues",
                 xticklabels=class_names, yticklabels=class_names)
@@ -36,12 +38,12 @@ def evaluate(model, test_loader, device, class_names, dataset_name):
     plt.ylabel("True Label")
     plt.xlabel("Predicted Label")
     plt.tight_layout()
-    plt.savefig(f"confusion_matrix_{dataset_name}.png", dpi=150)
+    plt.savefig(os.path.join(save_dir, f"confusion_matrix_{dataset_name}.png"), dpi=150)
     plt.show()
     return all_preds, all_labels
 
 
-def plot_history(history, dataset_name):
+def plot_history(history, dataset_name, save_dir="."):
     fig, axes = plt.subplots(1, 2, figsize=(14, 5))
     axes[0].plot(history["train_loss"], label="Train Loss (MAP)", marker="o")
     axes[0].set_title(f"Loss — {dataset_name}")
@@ -55,5 +57,6 @@ def plot_history(history, dataset_name):
 
     plt.suptitle(dataset_name, fontsize=14, fontweight="bold")
     plt.tight_layout()
-    plt.savefig(f"training_curve_{dataset_name}.png", dpi=150)
+    os.makedirs(save_dir, exist_ok=True)
+    plt.savefig(os.path.join(save_dir, f"training_curve_{dataset_name}.png"), dpi=150)
     plt.show()
