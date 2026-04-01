@@ -226,20 +226,24 @@ class LeNet5(nn.Module):
                 nn.init.uniform_(m.bias, -bound, bound)
 
     def forward(self, x):
-        # C1 → S2
-        x = self.s2(self.bn_c1(self.act(self.c1(x))))   # (B,6,14,14)
+        # C1: Conv → ScaledTanh
+        x = self.act(self.bn_c1(self.c1(x)))   # Conv → BN (v2) → ScaledTanh
+        # S2: sum×w+b → ScaledTanh (bên trong SubsamplingLayer)
+        x = self.s2(x)                          # (B, 6, 14, 14)
 
-        # C3 → S4 (ScaledTanh bên trong C3)
-        x = self.s4(self.c3(x))                          # (B,16,5,5)
+        # C3: partial conv → ScaledTanh (bên trong C3PartialConnection)
+        x = self.c3(x)
+        # S4
+        x = self.s4(x)                          # (B, 16, 5, 5)
 
-        # C5: Conv → (B,120,1,1) → flatten
-        x = self.act(self.c5(x))                         # (B,120,1,1)
-        x = x.view(x.size(0), -1)                        # (B,120)
+        # C5: Conv → ScaledTanh
+        x = self.act(self.c5(x))               # (B, 120, 1, 1)
+        x = x.view(x.size(0), -1)              # (B, 120)
         x = self.drop(self.bn_c5(x))
 
-        # F6
-        x = self.act(self.bn_f6(self.f6(x)))             # (B,84)
+        # F6: Linear → ScaledTanh
+        x = self.act(self.bn_f6(self.f6(x)))   # (B, 84)
         x = self.drop(x)
 
-        # Output RBF — trả về distances (nhỏ = tốt)
-        return self.output(x)                             # (B,num_classes)
+        # Output RBF
+        return self.output(x)                   # (B, num_classes)

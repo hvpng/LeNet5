@@ -8,7 +8,7 @@ CONFIG_MNIST = {
     # Loss: MAP (Eq. 9)
     "use_map_loss":   True,
     # Optimizer: Stochastic Diagonal LM (Appendix C)
-    "optimizer":      "sdlm",
+    "optimizer":      "sgd",
     "learning_rate":  0.0005,   # η ban đầu (Section III.B)
     # LR schedule theo Section III.B:
     # epoch 0-1: 0.0005, 2-4: 0.0002, 5-7: 0.0001, 8-11: 0.00005, 12+: 0.00001

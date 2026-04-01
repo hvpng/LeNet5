@@ -24,7 +24,7 @@ def evaluate(model, test_loader, device, class_names, dataset_name):
     all_labels = np.array(all_labels)
 
     acc = (all_preds == all_labels).mean()
-    print(f"\n✅ Test Accuracy [{dataset_name}]: {acc*100:.2f}%")
+    print(f"\n Test Accuracy [{dataset_name}]: {acc*100:.2f}%")
     print(classification_report(all_labels, all_preds,
                                 target_names=class_names, digits=4))
 
