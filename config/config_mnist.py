@@ -18,6 +18,8 @@ CONFIG_MNIST = {
         8:  0.00005,
         12: 0.00001,
     },
-    "batch_size":     1,        # paper: stochastic (1 sample per update)
+    "batch_size":     64,    
     "epochs":         20,       # paper: "20 iterations"
+    "checkpoint_dir":   "/content/drive/MyDrive/LeNet5/checkpoints",
+    "checkpoint_every": 1,
 }
