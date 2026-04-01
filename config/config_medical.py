@@ -1,12 +1,23 @@
-CONFIG_MEDICAL = {
-    "dataset": "medical_mnist",
-    "data_path": "/content/Data/MNIST Medical",   # chứa 6 subfolder classes
+CONFIG_MNIST = {
+    "dataset":        "mnist",
+    "data_path":      "/content/Data",
+    "num_classes":    10,
     "input_channels": 1,
-    "num_classes": 6,
-    "dropout": 0.0,
-    "activation": "tanh",
-    "learning_rate": 0.001,
-    "batch_size": 32,
-    "epochs": 20,
-    "optimizer": "adam",
+    "batchnorm":      False,
+    "dropout":        0.0,
+    # Loss: MAP (Eq. 9)
+    "use_map_loss":   True,
+    # Optimizer: Stochastic Diagonal LM (Appendix C)
+    "optimizer":      "sdlm",
+    "learning_rate":  0.0005,   # η ban đầu (Section III.B)
+    # LR schedule theo Section III.B:
+    # epoch 0-1: 0.0005, 2-4: 0.0002, 5-7: 0.0001, 8-11: 0.00005, 12+: 0.00001
+    "lr_schedule": {
+        2:  0.0002,
+        5:  0.0001,
+        8:  0.00005,
+        12: 0.00001,
+    },
+    "batch_size":     64,
+    "epochs":         20,       # paper: "20 iterations"
 }

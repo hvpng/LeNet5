@@ -53,8 +53,8 @@ def run(config, version="v1"):
 if __name__ == "__main__":
     # ── Baseline ──────────────────────────
     run(CONFIG_MNIST,   "v1")
-    run(CONFIG_FASHION, "v1")
-    run(CONFIG_MEDICAL, "v1")
+    # run(CONFIG_FASHION, "v1")
+    # run(CONFIG_MEDICAL, "v1")
 
     # ── Cải tiến ──────────────────────────
     # run(CONFIG_MNIST_V2,   "v2")
