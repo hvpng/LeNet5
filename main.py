@@ -43,7 +43,9 @@ def run(config, version="v1"):
     total_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
     print(f"  Trainable params: {total_params:,}\n")
 
-    save_path = f"best_{dataset}_{version}.pth"
+    ckpt_dir  = config.get("checkpoint_dir", "/content/drive/MyDrive/CV_NN/checkpoints")
+    save_path = os.path.join(ckpt_dir, f"best_{dataset}_{version}.pth")
+
     history   = train(model, train_loader, config, device, save_path)
 
     model.load_state_dict(torch.load(save_path, map_location=device))
