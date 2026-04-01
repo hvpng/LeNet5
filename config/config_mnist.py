@@ -20,6 +20,6 @@ CONFIG_MNIST = {
     },
     "batch_size":     64,    
     "epochs":         20,       # paper: "20 iterations"
-    "checkpoint_dir":   "/content/drive/MyDrive/LeNet5/checkpoints",
+    "checkpoint_dir":   "/content/drive/MyDrive/CV_NN/checkpoints",
     "checkpoint_every": 1,
 }
