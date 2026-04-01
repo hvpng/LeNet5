@@ -1,0 +1,15 @@
+CONFIG_MNIST_V2 = {
+    "dataset": "mnist",
+    "data_path": "/content/Data",
+    "input_channels": 1,
+    "num_classes": 10,
+    "dropout": 0.3,
+    "activation": "relu",
+    "learning_rate": 0.001,
+    "batch_size": 64,
+    "epochs": 20,
+    "optimizer": "adam",
+    "batchnorm": False,
+    "augmentation": True,    
+    "aug_type": "mnist",    
+}
