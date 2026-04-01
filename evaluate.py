@@ -4,6 +4,7 @@ import os
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.metrics import classification_report, confusion_matrix
+from model.lenet5_v2 import LeNet5V2
 
 def evaluate(model, test_loader, device, class_names, dataset_name, save_dir="."):
     """
@@ -16,8 +17,12 @@ def evaluate(model, test_loader, device, class_names, dataset_name, save_dir="."
     with torch.no_grad():
         for X, y in test_loader:
             X       = X.to(device)
-            rbf_out = model(X)
-            preds   = rbf_out.argmin(dim=1).cpu().numpy()
+            out = model(X)
+            # v2: argmax | v1: argmin
+            if isinstance(model, LeNet5V2):
+                preds = out.argmax(dim=1).cpu().numpy()
+            else:
+                preds = out.argmin(dim=1).cpu().numpy()
             all_preds.extend(preds)
             all_labels.extend(y.numpy())
 

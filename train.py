@@ -1,7 +1,10 @@
 import torch
+import torch.nn as nn
 import torch.optim as optim
+from model.lenet5    import LeNet5
+from model.lenet5_v2 import LeNet5V2
+from model.lenet5    import MAPLoss_RBF
 import os
-from model.lenet5 import MAPLoss_RBF, MSELoss_RBF
 
 
 class StochasticDiagLM(optim.Optimizer):
@@ -96,8 +99,13 @@ def train(model, train_loader, config, device, save_path="best_model.pth"):
     - LR schedule: giảm theo paper Section III.B cho v1
     - Epochs  : 20 (paper: "20 iterations through training set")
     """
-    use_map  = config.get("use_map_loss", True)
-    criterion = MAPLoss_RBF(j=0.0) if use_map else MSELoss_RBF()
+    # ── Loss + predict: tự detect theo class model ────────
+    if isinstance(model, LeNet5V2):
+        criterion = nn.CrossEntropyLoss()
+        get_preds = lambda out: out.argmax(dim=1)
+    else:
+        criterion = MAPLoss_RBF(j=0.0)
+        get_preds = lambda out: out.argmin(dim=1)
 
     opt_name = config.get("optimizer", "sdlm")
 
@@ -120,6 +128,7 @@ def train(model, train_loader, config, device, save_path="best_model.pth"):
         scheduler   = None
         use_hessian = True
 
+    lr_schedule = config.get("lr_schedule", {})
     # ── Checkpoint settings ───────────────────────────────
     ckpt_dir   = config.get("checkpoint_dir", "/content/drive/MyDrive/LeNet5/checkpoints")
     ckpt_every = config.get("checkpoint_every", 1)  # lưu mỗi N epochs
@@ -144,10 +153,12 @@ def train(model, train_loader, config, device, save_path="best_model.pth"):
     for epoch in range(start_epoch, config["epochs"]):
 
         # ── LR schedule từ paper Section III.B ──────────────
-        if use_hessian and lr_schedule:
-            new_lr = lr_schedule.get(epoch, None)
-            if new_lr:
-                for g in optimizer.param_groups:
+        if lr_schedule and epoch in lr_schedule:
+            new_lr = lr_schedule[epoch]
+            for g in optimizer.param_groups:
+                if 'lr' in g:
+                    g['lr'] = new_lr
+                if 'eta' in g:
                     g['eta'] = new_lr
 
         # ── Estimate diagonal Hessian (Appendix C) ──────────
@@ -166,14 +177,13 @@ def train(model, train_loader, config, device, save_path="best_model.pth"):
             X, y = X.to(device), y.to(device)
 
             optimizer.zero_grad()
-            rbf_out = model(X)              # (B, C) — RBF distances
-            loss    = criterion(rbf_out, y)
+            out = model(X)              # (B, C) — RBF distances
+            loss    = criterion(out, y)
             loss.backward()
             optimizer.step()
 
             total_loss += loss.item() * X.size(0)
-            # argmin: class với distance NHỎ NHẤT = predicted class
-            preds   = rbf_out.argmin(dim=1)
+            preds   = get_preds(out)
             correct += (preds == y).sum().item()
             total   += X.size(0)
 

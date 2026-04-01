@@ -7,7 +7,8 @@ from config.config_medical  import CONFIG_MEDICAL
 from config.config_mnist_v2   import CONFIG_MNIST_V2
 from config.config_fashion_v2 import CONFIG_FASHION_V2
 from config.config_medical_v2 import CONFIG_MEDICAL_V2
-from model.lenet5           import LeNet5
+from model.lenet5    import LeNet5      # v1: paper gốc
+from model.lenet5_v2 import LeNet5V2   # v2: cải tiến
 from utils                  import get_dataloader
 from train                  import train
 from evaluate               import evaluate, plot_history
@@ -31,12 +32,17 @@ def run(config, version="v1"):
 
     train_loader, test_loader = get_dataloader(config)
 
-    model = LeNet5(     
-        num_classes    = config["num_classes"],
-        input_channels = config["input_channels"],
-        batchnorm      = config.get("batchnorm", False),
-        dropout        = config.get("dropout", 0.0),
-    ).to(device)
+    if version == "v1":
+        model = LeNet5(     
+            num_classes    = config["num_classes"],
+            input_channels = config["input_channels"],
+        ).to(device)
+    else:
+        model = LeNet5V2(
+            num_classes    = config["num_classes"],
+            input_channels = config["input_channels"],
+            dropout        = config.get("dropout", 0.0),
+        ).to(device)
 
     print(model)
     total_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
@@ -54,10 +60,10 @@ def run(config, version="v1"):
 if __name__ == "__main__":
     # ── Baseline ──────────────────────────
     # run(CONFIG_MNIST,   "v1")
-    run(CONFIG_FASHION, "v1")
-    run(CONFIG_MEDICAL, "v1")
+    # run(CONFIG_FASHION, "v1")
+    # run(CONFIG_MEDICAL, "v1")
 
     # ── Cải tiến ──────────────────────────
-    # run(CONFIG_MNIST_V2,   "v2")
-    # run(CONFIG_FASHION_V2, "v2")
-    # run(CONFIG_MEDICAL_V2, "v2")
+    run(CONFIG_MNIST_V2,   "v2")
+    run(CONFIG_FASHION_V2, "v2")
+    run(CONFIG_MEDICAL_V2, "v2")
